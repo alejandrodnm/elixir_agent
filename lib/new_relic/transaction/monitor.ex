@@ -30,7 +30,16 @@ defmodule NewRelic.Transaction.Monitor do
 
   def add(pid), do: GenServer.call(__MODULE__, {:add, pid})
 
+  def stop(pid), do: GenServer.call(__MODULE__, {:stop, pid})
+
   # Server
+
+  def handle_call({:stop, pid}, _from, state) do
+    Transaction.Reporter.ensure_purge(pid)
+    Transaction.Reporter.complete(pid)
+    DistributedTrace.Tracker.cleanup(pid)
+    {:reply, :ok, %{state | pids: Map.delete(state.pids, pid)}}
+  end
 
   def handle_call({:add, pid}, _from, %{pids: pids} = state) do
     pids =

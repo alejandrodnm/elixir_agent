@@ -48,10 +48,21 @@ defmodule NewRelic.Transaction.Reporter do
     )
   end
 
+  def stop() do
+    Transaction.Monitor.stop(self())
+  end
+
   def start_other_transaction(category, name) do
     unless tracking?(self()) do
       start()
       AttrStore.add(__MODULE__, self(), other_transaction_name: "#{category}/#{name}")
+    end
+  end
+
+  def stop_other_transaction() do
+    if tracking?(self()) do
+      stop()
+      # AttrStore.purge(__MODULE__, self())
     end
   end
 

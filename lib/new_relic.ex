@@ -81,6 +81,9 @@ defmodule NewRelic do
   @spec start_transaction(String.t(), String.t()) :: :ok
   defdelegate start_transaction(category, name), to: NewRelic.Transaction
 
+  @spec stop_transaction() :: none()
+  defdelegate stop_transaction(), to: NewRelic.Transaction
+
   @doc """
   Stop an "Other" Transaction.
 
